@@ -1,26 +1,28 @@
 import * as ts from "typescript";
 
-const exportAssignment = (node: ts.ExportAssignment) => {
+type ExportExpressions = (string | undefined)[]
+
+const exportAssignment = (node: ts.ExportAssignment, exportExpressions: ExportExpressions) => {
   if (node.expression.kind === ts.SyntaxKind.ObjectLiteralExpression) {
     const expression = node.expression as ts.ObjectLiteralExpression;
 
-    for (const property of expression.properties) {
+    expression.properties.forEach((property) => {
       switch (property.kind) {
         case ts.SyntaxKind.ShorthandPropertyAssignment:
           if (property.name.kind === ts.SyntaxKind.Identifier) {
-            return property.name.text;
+            exportExpressions.push(property.name.text);
           }
           break;
 
         default:
           break;
       }
-    }
+    })
   }
 };
 
 export const getExportExpressions = (source: string) => {
-  const exportExpressions: (string | undefined)[] = [];
+  const exportExpressions: ExportExpressions = [];
 
   const sourceFile = ts.createSourceFile(
     "",
@@ -32,7 +34,7 @@ export const getExportExpressions = (source: string) => {
   const visit = (node: ts.Node) => {
     switch (node.kind) {
       case ts.SyntaxKind.ExportAssignment:
-        exportExpressions.push(exportAssignment(node as ts.ExportAssignment));
+        exportAssignment(node as ts.ExportAssignment, exportExpressions);
         break;
 
       default:

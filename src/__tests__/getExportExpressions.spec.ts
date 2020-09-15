@@ -15,11 +15,13 @@ const getSource = (fixtureFileName: string) => {
 };
 
 describe("getExportExpressions", () => {
-  it("var", () => {
-    const { source } = getSource("var.ts");
-
-    const result = getExportExpressions(source);
-
-    expect(result).toEqual({ exportExpressions: ["expressionVar1"] });
+  describe('ExportAssignment', () => {
+    it("ShorthandPropertyAssignment", () => {
+      const { source } = getSource("ExportAssignment/ShorthandPropertyAssignment.ts");
+  
+      const result = getExportExpressions(source);
+  
+      expect(result).toEqual({ exportExpressions: ["expressionVar1", 'expressionVar2', 'expressionVar3'] });
+    });
   });
 });
